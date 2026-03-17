@@ -9,7 +9,7 @@ const F1_TEAMS = {
   williams:     { name: 'Williams',     primary: '#1868DB', primaryLight: '#3580f0' },
   rb:           { name: 'Racing Bulls', primary: '#6692FF', primaryLight: '#88aaff' },
   haas:         { name: 'Haas',         primary: '#B6BABD', primaryLight: '#cdd0d3' },
-  sauber:       { name: 'Sauber',       primary: '#52E252', primaryLight: '#6ee66e' },
+  audi:         { name: 'Audi',          primary: '#E2001A', primaryLight: '#ff1a33' },
   cadillac:     { name: 'Cadillac',     primary: '#1E4D2B', primaryLight: '#2a6b3d' },
 };
 

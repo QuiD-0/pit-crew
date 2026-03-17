@@ -15,7 +15,7 @@ describe('getConstructorColor', () => {
     assert.equal(getConstructorColor('williams'), '#1868DB');
     assert.equal(getConstructorColor('rb'), '#6692FF');
     assert.equal(getConstructorColor('haas'), '#B6BABD');
-    assert.equal(getConstructorColor('sauber'), '#52E252');
+    assert.equal(getConstructorColor('audi'), '#E2001A');
     assert.equal(getConstructorColor('cadillac'), '#1E4D2B');
   });
 
@@ -27,7 +27,7 @@ describe('getConstructorColor', () => {
 
   it('모든 현재 F1 팀이 정의되어 있다', () => {
     const teams = ['mercedes', 'ferrari', 'red_bull', 'mclaren', 'aston_martin',
-                   'alpine', 'williams', 'rb', 'haas', 'sauber', 'cadillac'];
+                   'alpine', 'williams', 'rb', 'haas', 'audi', 'cadillac'];
     for (const team of teams) {
       assert.notEqual(getConstructorColor(team), '#888', `${team} 색상이 없음`);
     }
