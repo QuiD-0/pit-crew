@@ -60,7 +60,7 @@ async function renderCalendar() {
             </div>
             <div class="race-card__meta">
               ${countdown ? `<span class="race-card__countdown">${countdown}</span>` : ''}
-              <span class="race-card__date">${formatLocalDate(race.date, race.time).date}</span>
+              <span class="race-card__date">${formatLocalDate(race.date, race.time || '00:00:00Z').date}</span>
             </div>
           </summary>
           <div class="race-card__sessions">

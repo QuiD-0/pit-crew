@@ -1,21 +1,3 @@
-const CONSTRUCTOR_COLORS = {
-  mercedes: '#27F4D2',
-  ferrari: '#E8002D',
-  red_bull: '#3671C6',
-  mclaren: '#FF8000',
-  aston_martin: '#229971',
-  alpine: '#0093CC',
-  williams: '#1868DB',
-  rb: '#6692FF',
-  haas: '#B6BABD',
-  sauber: '#52E252',
-  cadillac: '#1E4D2B',
-};
-
-function getConstructorColor(constructorId) {
-  return CONSTRUCTOR_COLORS[constructorId] || '#888';
-}
-
 async function renderStandings() {
   const panel = document.getElementById('panel-standings');
   panel.innerHTML = '<div class="loading">Loading standings</div>';

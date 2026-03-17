@@ -2,7 +2,7 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 const { loadSrc } = require('./setup');
 
-loadSrc('src/standings.js');
+loadSrc('src/teams.js', 'src/standings.js');
 
 describe('getConstructorColor', () => {
   it('알려진 팀 ID에 대해 올바른 색상을 반환한다', () => {
@@ -34,10 +34,18 @@ describe('getConstructorColor', () => {
   });
 });
 
-describe('CONSTRUCTOR_COLORS', () => {
-  it('모든 색상이 유효한 hex 코드이다', () => {
-    for (const [team, color] of Object.entries(CONSTRUCTOR_COLORS)) {
-      assert.match(color, /^#[0-9A-Fa-f]{6}$/, `${team}: ${color}는 유효한 hex가 아님`);
+describe('F1_TEAMS', () => {
+  it('모든 팀의 primary 색상이 유효한 hex 코드이다', () => {
+    for (const [team, data] of Object.entries(F1_TEAMS)) {
+      assert.match(data.primary, /^#[0-9A-Fa-f]{6}$/, `${team}: ${data.primary}는 유효한 hex가 아님`);
+    }
+  });
+
+  it('모든 팀에 name, primary, primaryLight가 있다', () => {
+    for (const [team, data] of Object.entries(F1_TEAMS)) {
+      assert.ok(data.name, `${team}: name 누락`);
+      assert.ok(data.primary, `${team}: primary 누락`);
+      assert.ok(data.primaryLight, `${team}: primaryLight 누락`);
     }
   });
 });

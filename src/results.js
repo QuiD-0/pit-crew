@@ -22,7 +22,7 @@ async function renderResults() {
         ${top10.slice(0, 3).map((r, i) => `
           <div class="podium podium--p${i + 1}">
             <span class="podium__pos">${r.position}</span>
-            <span class="podium__color" style="background: ${getConstructorColor(r.Constructor.constructorId)}"></span>
+            <span class="podium__color" style="background: ${getConstructorColor(r.Constructor?.constructorId)}"></span>
             <div class="podium__driver">
               <span class="podium__name">${r.Driver.code}</span>
               <span class="podium__time">${r.Time?.time || r.status}</span>
@@ -36,7 +36,7 @@ async function renderResults() {
         ${top10.slice(3).map(r => `
           <div class="result-row">
             <span class="result-row__pos">${r.position}</span>
-            <span class="result-row__color" style="background: ${getConstructorColor(r.Constructor.constructorId)}"></span>
+            <span class="result-row__color" style="background: ${getConstructorColor(r.Constructor?.constructorId)}"></span>
             <span class="result-row__name">${r.Driver.code}</span>
             <span class="result-row__time">${r.Time?.time || r.status}</span>
             <span class="result-row__points">${r.points > 0 ? `+${r.points}` : ''}</span>
@@ -51,7 +51,7 @@ async function renderResults() {
             ${rest.map(r => `
               <div class="result-row">
                 <span class="result-row__pos">${r.position}</span>
-                <span class="result-row__color" style="background: ${getConstructorColor(r.Constructor.constructorId)}"></span>
+                <span class="result-row__color" style="background: ${getConstructorColor(r.Constructor?.constructorId)}"></span>
                 <span class="result-row__name">${r.Driver.code}</span>
                 <span class="result-row__time">${r.status === 'Finished' ? (r.Time?.time || '') : r.status}</span>
                 <span class="result-row__points">${r.points > 0 ? `+${r.points}` : ''}</span>
