@@ -183,3 +183,104 @@ body {
   color: var(--color-text-muted);
   text-align: center;
 }
+
+/* === Race Card === */
+.race-card {
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.race-card--past { opacity: 0.5; }
+
+.race-card--next {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 12px rgba(var(--color-primary), 0.15);
+}
+
+.race-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.race-card__header::-webkit-details-marker { display: none; }
+
+.race-card__round {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-primary);
+  min-width: 28px;
+}
+
+.race-card__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.race-card__name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.race-card__location {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.race-card__meta {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.race-card__countdown {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.race-card__date {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.race-card__sessions {
+  padding: 4px 12px 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+.session {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 12px;
+}
+
+.session__name {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.session__time {
+  color: var(--color-text-muted);
+}
+
+/* === Error === */
+.error {
+  padding: 20px;
+  text-align: center;
+  color: #ff6b6b;
+  font-size: 13px;
+}
