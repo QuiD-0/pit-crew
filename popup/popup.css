@@ -1,0 +1,185 @@
+/* === CSS Custom Properties (기본 테마: F1 레드) === */
+:root {
+  --color-primary: #e10600;
+  --color-primary-light: #ff1e00;
+  --color-bg: #15151e;
+  --color-bg-card: #1e1e2e;
+  --color-bg-hover: #2a2a3e;
+  --color-text: #f0f0f0;
+  --color-text-muted: #8888a0;
+  --color-border: #2e2e42;
+  --color-accent: var(--color-primary);
+}
+
+/* === Reset & Base === */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 380px;
+  height: 520px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  overflow: hidden;
+}
+
+/* === Header === */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.header__title {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--color-primary);
+}
+
+.header__theme-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text);
+  transition: border-color 0.2s;
+}
+
+.header__theme-btn:hover {
+  border-color: var(--color-primary);
+}
+
+/* === Tabs === */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tabs__btn {
+  flex: 1;
+  padding: 10px;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.tabs__btn:hover {
+  color: var(--color-text);
+  background: var(--color-bg-hover);
+}
+
+.tabs__btn--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+/* === Content === */
+.content {
+  height: calc(520px - 50px - 42px);
+  overflow-y: auto;
+}
+
+.content::-webkit-scrollbar { width: 4px; }
+.content::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+
+.tab-panel { display: none; padding: 12px 16px; }
+.tab-panel--active { display: block; }
+
+/* === Loading === */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: var(--color-text-muted);
+}
+
+.loading::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  margin-left: 8px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* === Theme Modal === */
+.theme-modal[hidden] { display: none; }
+
+.theme-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.theme-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.theme-modal__body {
+  position: relative;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+  width: 320px;
+}
+
+.theme-modal__body h2 {
+  font-size: 14px;
+  margin-bottom: 16px;
+  color: var(--color-text);
+}
+
+.theme-modal__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.theme-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background: var(--color-bg);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theme-swatch:hover { border-color: var(--color-border); }
+.theme-swatch--active { border-color: var(--color-primary); }
+
+.theme-swatch__color {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.theme-swatch__name {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  text-align: center;
+}

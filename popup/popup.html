@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="header">
+    <h1 class="header__title">PIT CREW</h1>
+    <button class="header__theme-btn" id="theme-btn" title="Change team theme">🏎️</button>
+  </header>
+
+  <nav class="tabs">
+    <button class="tabs__btn tabs__btn--active" data-tab="calendar">Calendar</button>
+    <button class="tabs__btn" data-tab="standings">Standings</button>
+    <button class="tabs__btn" data-tab="results">Results</button>
+  </nav>
+
+  <main class="content">
+    <section class="tab-panel tab-panel--active" id="panel-calendar"></section>
+    <section class="tab-panel" id="panel-standings"></section>
+    <section class="tab-panel" id="panel-results"></section>
+  </main>
+
+  <div class="theme-modal" id="theme-modal" hidden>
+    <div class="theme-modal__backdrop"></div>
+    <div class="theme-modal__body">
+      <h2>Choose Team Theme</h2>
+      <div class="theme-modal__grid" id="theme-grid"></div>
+    </div>
+  </div>
+
+  <script src="../src/themes.js"></script>
+  <script src="../src/cache.js"></script>
+  <script src="../src/api.js"></script>
+  <script src="../src/calendar.js"></script>
+  <script src="../src/standings.js"></script>
+  <script src="../src/results.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
