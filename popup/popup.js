@@ -20,6 +20,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   themeBtn.addEventListener('click', () => themeModal.hidden = false);
   backdrop.addEventListener('click', () => themeModal.hidden = true);
 
+  // Refresh button — 캐시 지우고 다시 로드
+  const refreshBtn = document.getElementById('refresh-btn');
+  refreshBtn.addEventListener('click', createRefreshHandler(refreshBtn));
+
   // Initialize
   initThemes();
   renderCalendar();

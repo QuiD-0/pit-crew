@@ -39,7 +39,12 @@ body {
   color: var(--color-primary);
 }
 
-.header__theme-btn {
+.header__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.header__btn {
   background: none;
   border: 1px solid var(--color-border);
   border-radius: 6px;
@@ -47,11 +52,15 @@ body {
   cursor: pointer;
   font-size: 14px;
   color: var(--color-text);
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, transform 0.2s;
 }
 
-.header__theme-btn:hover {
+.header__btn:hover {
   border-color: var(--color-primary);
+}
+
+.header__btn--spinning {
+  animation: spin 0.6s linear infinite;
 }
 
 /* === Tabs === */
