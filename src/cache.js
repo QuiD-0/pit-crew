@@ -1,7 +1,8 @@
 const CACHE_TTL = {
-  schedule: 24 * 60 * 60 * 1000,   // 24시간
-  standings: 60 * 60 * 1000,        // 1시간
-  results: 60 * 60 * 1000,          // 1시간
+  schedule: 24 * 60 * 60 * 1000,           // 24시간
+  standings_drivers: 60 * 60 * 1000,       // 1시간
+  standings_constructors: 60 * 60 * 1000,  // 1시간
+  results: 60 * 60 * 1000,                 // 1시간
 };
 
 async function cacheGet(key) {

@@ -15,17 +15,17 @@ function getSessionList(race) {
   if (race.SprintQualifying) sessions.push({ name: 'Sprint Quali', ...race.SprintQualifying });
   if (race.Sprint) sessions.push({ name: 'Sprint', ...race.Sprint });
   if (race.Qualifying) sessions.push({ name: 'Qualifying', ...race.Qualifying });
-  sessions.push({ name: 'Race', date: race.date, time: race.time });
+  sessions.push({ name: 'Race', date: race.date, time: race.time || '00:00:00Z' });
   return sessions;
 }
 
 function isNextRace(race) {
-  const raceDate = new Date(`${race.date}T${race.time}`);
+  const raceDate = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
   return raceDate > new Date();
 }
 
 function getCountdown(race) {
-  const raceDate = new Date(`${race.date}T${race.time}`);
+  const raceDate = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
   const diff = raceDate - new Date();
   if (diff <= 0) return null;
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));

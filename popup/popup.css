@@ -197,7 +197,7 @@ body {
 
 .race-card--next {
   border-color: var(--color-primary);
-  box-shadow: 0 0 12px rgba(var(--color-primary), 0.15);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-primary) 15%, transparent);
 }
 
 .race-card__header {
