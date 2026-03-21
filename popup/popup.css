@@ -490,3 +490,28 @@ body {
   font-weight: 600;
   color: #bf40bf;
 }
+
+/* === Stale Notice === */
+.stale-notice {
+  text-align: center;
+  padding: 8px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* === Toast === */
+.toast {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e74c3c;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 200;
+}
+.toast--visible { opacity: 1; }
