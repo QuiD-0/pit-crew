@@ -8,6 +8,7 @@ globalThis.renderCalendar = async () => { renderCount++; };
 globalThis.renderStandings = async () => { renderCount++; };
 globalThis.renderResults = async () => { renderCount++; };
 
+loadSrc('src/cache.js');
 loadSrc('src/refresh.js');
 
 function createMockBtn() {
@@ -27,18 +28,21 @@ describe('createRefreshHandler', () => {
   beforeEach(() => {
     resetStorage();
     renderCount = 0;
+    globalThis.showToast = () => {};
   });
 
   it('클릭 시 캐시를 지우고 렌더 함수를 호출한다', async () => {
     storage.schedule = { data: [], timestamp: Date.now() };
     storage.results = { data: {}, timestamp: Date.now() };
+    storage.standings_drivers = { data: [], timestamp: Date.now() };
+    storage.standings_constructors = { data: [], timestamp: Date.now() };
 
     const btn = createMockBtn();
     const handler = createRefreshHandler(btn);
     await handler();
 
-    assert.equal(storage.schedule, undefined);
-    assert.equal(storage.results, undefined);
+    assert.equal(storage.schedule.timestamp, 0);
+    assert.equal(storage.results.timestamp, 0);
     assert.equal(renderCount, 3);
   });
 
@@ -100,5 +104,27 @@ describe('createRefreshHandler', () => {
     await handler();
 
     assert.equal(callCount, 2);
+  });
+
+  it('API 실패 시 기존 데이터를 유지하고 showToast를 호출한다', async () => {
+    storage.schedule = { data: [1], timestamp: Date.now() };
+    storage.results = { data: {}, timestamp: Date.now() };
+    storage.standings_drivers = { data: [], timestamp: Date.now() };
+    storage.standings_constructors = { data: [], timestamp: Date.now() };
+
+    let toastMsg = null;
+    globalThis.showToast = (msg) => { toastMsg = msg; };
+
+    globalThis.renderCalendar = async () => { throw new Error('offline'); };
+    globalThis.renderStandings = async () => {};
+    globalThis.renderResults = async () => {};
+
+    const btn = createMockBtn();
+    const handler = createRefreshHandler(btn);
+    await handler();
+
+    // cacheInvalidate로 timestamp가 0이 되지만 data는 보존됨
+    assert.ok(storage.schedule.data);
+    assert.equal(toastMsg, '연결 실패');
   });
 });

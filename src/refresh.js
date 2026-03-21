@@ -7,10 +7,10 @@ function createRefreshHandler(btn) {
     btn.disabled = true;
     btn.classList.add('header__btn--spinning');
     try {
-      await new Promise(resolve => {
-        chrome.storage.local.remove(['schedule', 'standings_drivers', 'standings_constructors', 'results'], resolve);
-      });
+      await cacheInvalidate(['schedule', 'standings_drivers', 'standings_constructors', 'results']);
       await Promise.all([renderCalendar(), renderStandings(), renderResults()]);
+    } catch (err) {
+      showToast('연결 실패');
     } finally {
       btn.classList.remove('header__btn--spinning');
       btn.disabled = false;
