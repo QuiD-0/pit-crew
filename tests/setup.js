@@ -8,8 +8,16 @@ const storage = {};
 globalThis.chrome = {
   storage: {
     local: {
-      get(key, cb) {
-        cb({ [key]: storage[key] || undefined });
+      get(keys, cb) {
+        if (Array.isArray(keys)) {
+          const result = {};
+          for (const key of keys) {
+            if (storage[key] !== undefined) result[key] = storage[key];
+          }
+          cb(result);
+        } else {
+          cb({ [keys]: storage[keys] || undefined });
+        }
       },
       set(obj, cb) {
         Object.assign(storage, obj);

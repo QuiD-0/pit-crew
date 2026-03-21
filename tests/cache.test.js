@@ -46,6 +46,62 @@ describe('cacheSet / cacheGet', () => {
   });
 });
 
+describe('cacheGet stale mode', () => {
+  beforeEach(() => resetStorage());
+
+  it('stale:true — TTL 만료된 데이터를 { data, timestamp, isStale: true }로 반환한다', async () => {
+    const ts = Date.now() - (2 * 60 * 60 * 1000);
+    storage.results = { data: { test: true }, timestamp: ts };
+    const result = await cacheGet('results', { stale: true });
+    assert.deepEqual(result, { data: { test: true }, timestamp: ts, isStale: true });
+  });
+
+  it('stale:true — TTL 이내면 { data, timestamp, isStale: false }로 반환한다', async () => {
+    const ts = Date.now() - (30 * 60 * 1000);
+    storage.results = { data: { test: true }, timestamp: ts };
+    const result = await cacheGet('results', { stale: true });
+    assert.deepEqual(result, { data: { test: true }, timestamp: ts, isStale: false });
+  });
+
+  it('stale:true — 데이터가 없으면 null을 반환한다', async () => {
+    const result = await cacheGet('nonexistent', { stale: true });
+    assert.equal(result, null);
+  });
+
+  it('stale:false(기본값)는 기존과 동일하게 동작한다', async () => {
+    storage.results = {
+      data: { test: true },
+      timestamp: Date.now() - (2 * 60 * 60 * 1000),
+    };
+    const result = await cacheGet('results');
+    assert.equal(result, null);
+  });
+});
+
+describe('cacheInvalidate', () => {
+  beforeEach(() => resetStorage());
+
+  it('키의 timestamp를 0으로 리셋한다', async () => {
+    storage.schedule = { data: [1, 2], timestamp: Date.now() };
+    await cacheInvalidate(['schedule']);
+    assert.equal(storage.schedule.timestamp, 0);
+    assert.deepEqual(storage.schedule.data, [1, 2]);
+  });
+
+  it('여러 키를 한번에 무효화한다', async () => {
+    storage.schedule = { data: [], timestamp: Date.now() };
+    storage.results = { data: {}, timestamp: Date.now() };
+    await cacheInvalidate(['schedule', 'results']);
+    assert.equal(storage.schedule.timestamp, 0);
+    assert.equal(storage.results.timestamp, 0);
+  });
+
+  it('존재하지 않는 키는 무시한다', async () => {
+    await cacheInvalidate(['nonexistent']);
+    assert.equal(storage.nonexistent, undefined);
+  });
+});
+
 describe('CACHE_TTL', () => {
   it('schedule은 24시간이다', () => {
     assert.equal(CACHE_TTL.schedule, 24 * 60 * 60 * 1000);
