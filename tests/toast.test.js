@@ -28,4 +28,21 @@ describe('timeAgo', () => {
   it('23시간은 시간 단위로 반환한다', () => {
     assert.equal(timeAgo(Date.now() - 23 * 60 * 60000), '23시간 전');
   });
+
+  it('정확히 60분은 1시간으로 반환한다', () => {
+    assert.equal(timeAgo(Date.now() - 60 * 60000), '1시간 전');
+  });
+
+  it('정확히 24시간은 1일로 반환한다', () => {
+    assert.equal(timeAgo(Date.now() - 24 * 60 * 60000), '1일 전');
+  });
+
+  it('timestamp=0 (매우 오래된 값)은 일 단위로 반환한다', () => {
+    const result = timeAgo(0);
+    assert.match(result, /\d+일 전/);
+  });
+
+  it('현재 시각과 같으면 "방금 전"을 반환한다', () => {
+    assert.equal(timeAgo(Date.now()), '방금 전');
+  });
 });

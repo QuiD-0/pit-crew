@@ -151,4 +151,23 @@ describe('renderCalendar', () => {
     await renderCalendar();
     assert.ok(!panel.innerHTML.includes('stale-notice'));
   });
+
+  it('빈 레이스 배열 + stale → stale notice만 표시', async () => {
+    const ts = Date.now() - (5 * 60 * 60 * 1000);
+    globalThis.getSchedule = async () => ({
+      data: [],
+      timestamp: ts,
+      isStale: true,
+    });
+    await renderCalendar();
+    assert.ok(panel.innerHTML.includes('stale-notice'));
+    assert.ok(!panel.innerHTML.includes('race-card'));
+  });
+
+  it('API 에러 시 에러 메시지를 표시한다 (stale 캐시 없음)', async () => {
+    globalThis.getSchedule = async () => { throw new Error('network error'); };
+    await renderCalendar();
+    assert.ok(panel.innerHTML.includes('Failed to load calendar'));
+    assert.ok(panel.innerHTML.includes('network error'));
+  });
 });

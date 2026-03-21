@@ -102,6 +102,55 @@ describe('cacheInvalidate', () => {
   });
 });
 
+describe('cacheGet stale — 엣지 케이스', () => {
+  beforeEach(() => resetStorage());
+
+  it('timestamp=0 (무효화된 캐시) + stale:true → isStale: true', async () => {
+    storage.schedule = { data: [1, 2], timestamp: 0 };
+    const result = await cacheGet('schedule', { stale: true });
+    assert.equal(result.isStale, true);
+    assert.deepEqual(result.data, [1, 2]);
+  });
+
+  it('timestamp=0 (무효화된 캐시) + stale:false → null', async () => {
+    storage.schedule = { data: [1, 2], timestamp: 0 };
+    const result = await cacheGet('schedule');
+    assert.equal(result, null);
+  });
+
+  it('stale:true로 null 데이터가 저장된 캐시 → { data: null, isStale }', async () => {
+    storage.results = { data: null, timestamp: Date.now() };
+    const result = await cacheGet('results', { stale: true });
+    assert.equal(result.data, null);
+    assert.equal(result.isStale, false);
+  });
+});
+
+describe('cacheInvalidate — 엣지 케이스', () => {
+  beforeEach(() => resetStorage());
+
+  it('빈 배열을 전달하면 아무것도 하지 않는다', async () => {
+    storage.schedule = { data: [1], timestamp: Date.now() };
+    await cacheInvalidate([]);
+    assert.ok(storage.schedule.timestamp > 0);
+  });
+
+  it('존재하는 키와 없는 키가 섞여있으면 존재하는 것만 무효화한다', async () => {
+    storage.schedule = { data: [1], timestamp: Date.now() };
+    await cacheInvalidate(['schedule', 'nonexistent']);
+    assert.equal(storage.schedule.timestamp, 0);
+    assert.equal(storage.nonexistent, undefined);
+  });
+
+  it('무효화 후 cacheGet stale:true로 데이터를 복원할 수 있다', async () => {
+    storage.schedule = { data: [1, 2, 3], timestamp: Date.now() };
+    await cacheInvalidate(['schedule']);
+    const result = await cacheGet('schedule', { stale: true });
+    assert.deepEqual(result.data, [1, 2, 3]);
+    assert.equal(result.isStale, true);
+  });
+});
+
 describe('CACHE_TTL', () => {
   it('schedule은 24시간이다', () => {
     assert.equal(CACHE_TTL.schedule, 24 * 60 * 60 * 1000);

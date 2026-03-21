@@ -83,4 +83,28 @@ describe('renderStandings', () => {
     await renderStandings();
     assert.ok(!panel.innerHTML.includes('stale-notice'));
   });
+
+  it('양쪽 다 stale → 가장 오래된 timestamp으로 표시', async () => {
+    const oldTs = Date.now() - (5 * 60 * 60 * 1000);
+    const newTs = Date.now() - (1 * 60 * 60 * 1000);
+    globalThis.getDriverStandings = async () => ({ data: mockDrivers, timestamp: oldTs, isStale: true });
+    globalThis.getConstructorStandings = async () => ({ data: mockConstructors, timestamp: newTs, isStale: true });
+    await renderStandings();
+    assert.ok(panel.innerHTML.includes('stale-notice'));
+    assert.ok(panel.innerHTML.includes('5시간 전'));
+  });
+
+  it('API 에러 시 에러 메시지를 표시한다', async () => {
+    globalThis.getDriverStandings = async () => { throw new Error('offline'); };
+    globalThis.getConstructorStandings = async () => ({ data: mockConstructors, timestamp: Date.now(), isStale: false });
+    await renderStandings();
+    assert.ok(panel.innerHTML.includes('Failed to load standings'));
+  });
+
+  it('빈 드라이버 배열도 크래시하지 않는다', async () => {
+    globalThis.getDriverStandings = async () => ({ data: [], timestamp: Date.now(), isStale: false });
+    globalThis.getConstructorStandings = async () => ({ data: [], timestamp: Date.now(), isStale: false });
+    await renderStandings();
+    assert.ok(!panel.innerHTML.includes('error'));
+  });
 });

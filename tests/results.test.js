@@ -249,4 +249,42 @@ describe('renderResults', () => {
     await renderResults();
     assert.ok(panelHtml.includes('No results available yet'));
   });
+
+  it('stale + null data → "No results" 메시지 (stale notice 아님)', async () => {
+    globalThis.getLastRaceResults = async () => ({
+      data: null,
+      timestamp: Date.now() - (2 * 60 * 60 * 1000),
+      isStale: true,
+    });
+    await renderResults();
+    assert.ok(panelHtml.includes('No results available yet'));
+    assert.ok(!panelHtml.includes('stale-notice'));
+  });
+
+  it('결과가 3명 미만이어도 크래시하지 않는다', async () => {
+    const race = mockRace();
+    race.Results = race.Results.slice(0, 2);
+    globalThis.getLastRaceResults = async () => ({
+      data: race,
+      timestamp: Date.now(),
+      isStale: false,
+    });
+    await renderResults();
+    assert.ok(panelHtml.includes('podium--p1'));
+    assert.ok(panelHtml.includes('podium--p2'));
+    assert.ok(!panelHtml.includes('podium--p3'));
+  });
+
+  it('빈 Results 배열이어도 크래시하지 않는다', async () => {
+    const race = mockRace();
+    race.Results = [];
+    globalThis.getLastRaceResults = async () => ({
+      data: race,
+      timestamp: Date.now(),
+      isStale: false,
+    });
+    await renderResults();
+    assert.ok(panelHtml.includes('Australian Grand Prix'));
+    assert.ok(!panelHtml.includes('podium--p1'));
+  });
 });

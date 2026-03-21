@@ -127,4 +127,42 @@ describe('createRefreshHandler', () => {
     assert.ok(storage.schedule.data);
     assert.equal(toastMsg, '연결 실패');
   });
+
+  it('API 실패 후에도 버튼 상태가 복원된다', async () => {
+    globalThis.renderCalendar = async () => { throw new Error('offline'); };
+    globalThis.renderStandings = async () => {};
+    globalThis.renderResults = async () => {};
+    globalThis.showToast = () => {};
+
+    const btn = createMockBtn();
+    const handler = createRefreshHandler(btn);
+    await handler();
+
+    assert.equal(btn.disabled, false);
+    assert.equal(btn._classes.has('header__btn--spinning'), false);
+  });
+
+  it('3개 render 모두 실패해도 토스트 1번만 호출된다', async () => {
+    let toastCount = 0;
+    globalThis.showToast = () => { toastCount++; };
+    globalThis.renderCalendar = async () => { throw new Error('fail1'); };
+    globalThis.renderStandings = async () => { throw new Error('fail2'); };
+    globalThis.renderResults = async () => { throw new Error('fail3'); };
+
+    const btn = createMockBtn();
+    const handler = createRefreshHandler(btn);
+    await handler();
+
+    assert.equal(toastCount, 1);
+  });
+
+  it('캐시가 비어있어도 refresh가 크래시하지 않는다', async () => {
+    globalThis.renderCalendar = async () => {};
+    globalThis.renderStandings = async () => {};
+    globalThis.renderResults = async () => {};
+
+    const btn = createMockBtn();
+    const handler = createRefreshHandler(btn);
+    await assert.doesNotReject(() => handler());
+  });
 });

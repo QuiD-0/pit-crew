@@ -201,3 +201,66 @@ describe('getSchedule stale fallback', () => {
     assert.equal(result.isStale, false);
   });
 });
+
+describe('stale fallback — 다른 API 함수들', () => {
+  beforeEach(() => {
+    resetStorage();
+    mock.restoreAll();
+  });
+
+  it('getDriverStandings — API 실패 + stale 캐시 폴백', async () => {
+    const ts = Date.now() - (2 * 60 * 60 * 1000);
+    storage.standings_drivers = { data: [{ position: '1' }], timestamp: ts };
+    mock.method(globalThis, 'fetch', () => Promise.reject(new Error('offline')));
+    const result = await getDriverStandings();
+    assert.deepEqual(result.data, [{ position: '1' }]);
+    assert.equal(result.isStale, true);
+  });
+
+  it('getDriverStandings — API 실패 + 캐시 없으면 에러', async () => {
+    mock.method(globalThis, 'fetch', () => Promise.reject(new Error('offline')));
+    await assert.rejects(() => getDriverStandings(), /offline/);
+  });
+
+  it('getConstructorStandings — API 실패 + stale 캐시 폴백', async () => {
+    const ts = Date.now() - (2 * 60 * 60 * 1000);
+    storage.standings_constructors = { data: [{ position: '1' }], timestamp: ts };
+    mock.method(globalThis, 'fetch', () => Promise.reject(new Error('offline')));
+    const result = await getConstructorStandings();
+    assert.deepEqual(result.data, [{ position: '1' }]);
+    assert.equal(result.isStale, true);
+  });
+
+  it('getLastRaceResults — API 실패 + stale null 데이터 캐시 폴백', async () => {
+    const ts = Date.now() - (2 * 60 * 60 * 1000);
+    storage.results = { data: null, timestamp: ts };
+    mock.method(globalThis, 'fetch', () => Promise.reject(new Error('offline')));
+    const result = await getLastRaceResults();
+    assert.equal(result.data, null);
+    assert.equal(result.isStale, true);
+  });
+
+  it('getLastRaceResults — API 실패 + 캐시 없으면 에러', async () => {
+    mock.method(globalThis, 'fetch', () => Promise.reject(new Error('offline')));
+    await assert.rejects(() => getLastRaceResults(), /offline/);
+  });
+
+  it('HTTP 에러(500) + stale 캐시 → 폴백', async () => {
+    const ts = Date.now() - (48 * 60 * 60 * 1000);
+    storage.schedule = { data: [{ round: '1' }], timestamp: ts };
+    mock.method(globalThis, 'fetch', () =>
+      Promise.resolve({ ok: false, status: 500 })
+    );
+    const result = await getSchedule();
+    assert.deepEqual(result.data, [{ round: '1' }]);
+    assert.equal(result.isStale, true);
+  });
+
+  it('네트워크 TypeError + stale 캐시 → 폴백', async () => {
+    const ts = Date.now() - (48 * 60 * 60 * 1000);
+    storage.schedule = { data: [{ round: '1' }], timestamp: ts };
+    mock.method(globalThis, 'fetch', () => Promise.reject(new TypeError('Failed to fetch')));
+    const result = await getSchedule();
+    assert.equal(result.isStale, true);
+  });
+});
