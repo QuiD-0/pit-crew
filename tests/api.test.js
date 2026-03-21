@@ -1,6 +1,6 @@
 const { describe, it, beforeEach, mock } = require('node:test');
 const assert = require('node:assert/strict');
-const { resetStorage, loadSrc } = require('./setup');
+const { resetStorage, loadSrc, storage } = require('./setup');
 
 loadSrc('src/cache.js', 'src/api.js');
 
@@ -46,7 +46,7 @@ describe('getSchedule', () => {
       })
     );
     const result = await getSchedule();
-    assert.deepEqual(result, mockRaces);
+    assert.deepEqual(result.data, mockRaces);
   });
 
   it('두 번째 호출에서 캐시된 데이터를 반환한다', async () => {
@@ -84,7 +84,7 @@ describe('getDriverStandings', () => {
       })
     );
     const result = await getDriverStandings();
-    assert.deepEqual(result, mockStandings);
+    assert.deepEqual(result.data, mockStandings);
   });
 
   it('StandingsLists가 비어있으면 빈 배열을 반환한다', async () => {
@@ -97,7 +97,7 @@ describe('getDriverStandings', () => {
       })
     );
     const result = await getDriverStandings();
-    assert.deepEqual(result, []);
+    assert.deepEqual(result.data, []);
   });
 });
 
@@ -118,7 +118,7 @@ describe('getConstructorStandings', () => {
       })
     );
     const result = await getConstructorStandings();
-    assert.deepEqual(result, mockStandings);
+    assert.deepEqual(result.data, mockStandings);
   });
 });
 
@@ -139,7 +139,7 @@ describe('getLastRaceResults', () => {
       })
     );
     const result = await getLastRaceResults();
-    assert.deepEqual(result, mockRace);
+    assert.deepEqual(result.data, mockRace);
   });
 
   it('결과가 없으면 null을 반환한다', async () => {
@@ -152,6 +152,52 @@ describe('getLastRaceResults', () => {
       })
     );
     const result = await getLastRaceResults();
-    assert.equal(result, null);
+    assert.equal(result.data, null);
+  });
+});
+
+describe('getSchedule stale fallback', () => {
+  beforeEach(() => {
+    resetStorage();
+    mock.restoreAll();
+  });
+
+  it('API 성공 시 { data, timestamp, isStale: false }를 반환한다', async () => {
+    const mockRaces = [{ round: '1' }];
+    mock.method(globalThis, 'fetch', () =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          MRData: { RaceTable: { Races: mockRaces } },
+        }),
+      })
+    );
+    const result = await getSchedule();
+    assert.deepEqual(result.data, mockRaces);
+    assert.equal(result.isStale, false);
+    assert.ok(result.timestamp);
+  });
+
+  it('API 실패 + stale 캐시 있으면 stale 데이터를 반환한다', async () => {
+    const ts = Date.now() - (48 * 60 * 60 * 1000);
+    storage.schedule = { data: [{ round: '1' }], timestamp: ts };
+    mock.method(globalThis, 'fetch', () => Promise.reject(new Error('offline')));
+    const result = await getSchedule();
+    assert.deepEqual(result.data, [{ round: '1' }]);
+    assert.equal(result.isStale, true);
+    assert.equal(result.timestamp, ts);
+  });
+
+  it('API 실패 + 캐시 없으면 에러를 던진다', async () => {
+    mock.method(globalThis, 'fetch', () => Promise.reject(new Error('offline')));
+    await assert.rejects(() => getSchedule(), /offline/);
+  });
+
+  it('fresh 캐시 히트 시 저장 시점 timestamp를 반환한다', async () => {
+    const ts = Date.now() - (1 * 60 * 60 * 1000);
+    storage.schedule = { data: [{ round: '1' }], timestamp: ts };
+    const result = await getSchedule();
+    assert.equal(result.timestamp, ts);
+    assert.equal(result.isStale, false);
   });
 });
