@@ -1,8 +1,8 @@
-const { describe, it } = require('node:test');
+const { describe, it, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
 const { loadSrc } = require('./setup');
 
-loadSrc('src/teams.js', 'src/standings.js');
+loadSrc('src/teams.js', 'src/toast.js', 'src/standings.js');
 
 describe('getConstructorColor', () => {
   it('알려진 팀 ID에 대해 올바른 색상을 반환한다', () => {
@@ -47,5 +47,40 @@ describe('F1_TEAMS', () => {
       assert.ok(data.primary, `${team}: primary 누락`);
       assert.ok(data.primaryLight, `${team}: primaryLight 누락`);
     }
+  });
+});
+
+describe('renderStandings', () => {
+  const mockDrivers = [
+    { position: '1', points: '100', Driver: { givenName: 'Max', familyName: 'Verstappen' }, Constructors: [{ constructorId: 'red_bull', name: 'Red Bull' }] },
+  ];
+  const mockConstructors = [
+    { position: '1', points: '200', Constructor: { constructorId: 'red_bull', name: 'Red Bull' } },
+  ];
+
+  let panel;
+  beforeEach(() => {
+    panel = { innerHTML: '', querySelector: () => null, querySelectorAll: () => [] };
+    const origGetById = globalThis.document.getElementById;
+    globalThis.document.getElementById = (id) => {
+      if (id === 'panel-standings') return panel;
+      return origGetById(id);
+    };
+    globalThis.getDriverStandings = async () => ({ data: mockDrivers, timestamp: Date.now(), isStale: false });
+    globalThis.getConstructorStandings = async () => ({ data: mockConstructors, timestamp: Date.now(), isStale: false });
+  });
+
+  it('stale 데이터일 때 stale-notice를 표시한다', async () => {
+    const ts = Date.now() - (3 * 60 * 60 * 1000);
+    globalThis.getDriverStandings = async () => ({ data: mockDrivers, timestamp: ts, isStale: true });
+    globalThis.getConstructorStandings = async () => ({ data: mockConstructors, timestamp: Date.now(), isStale: false });
+    await renderStandings();
+    assert.ok(panel.innerHTML.includes('stale-notice'));
+    assert.ok(panel.innerHTML.includes('3시간 전'));
+  });
+
+  it('fresh 데이터일 때 stale-notice를 표시하지 않는다', async () => {
+    await renderStandings();
+    assert.ok(!panel.innerHTML.includes('stale-notice'));
   });
 });

@@ -1,8 +1,8 @@
-const { describe, it } = require('node:test');
+const { describe, it, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
 const { loadSrc } = require('./setup');
 
-loadSrc('src/cache.js', 'src/api.js', 'src/calendar.js');
+loadSrc('src/cache.js', 'src/toast.js', 'src/api.js', 'src/calendar.js');
 
 describe('formatLocalDate', () => {
   it('유효한 날짜/시간을 파싱한다', () => {
@@ -106,5 +106,49 @@ describe('getCountdown', () => {
     const result = getCountdown(race);
     assert.ok(result);
     assert.match(result, /\d+h \d+m/);
+  });
+});
+
+describe('renderCalendar', () => {
+  const mockRace = {
+    round: '1',
+    raceName: 'Australian Grand Prix',
+    date: '2099-03-15',
+    time: '04:00:00Z',
+    Circuit: { Location: { locality: 'Melbourne', country: 'Australia' } },
+    FirstPractice: { date: '2099-03-13', time: '01:30:00Z' },
+    Qualifying: { date: '2099-03-14', time: '05:00:00Z' },
+  };
+
+  let panel;
+  beforeEach(() => {
+    panel = { innerHTML: '', querySelector: () => null, querySelectorAll: () => [] };
+    const origGetById = globalThis.document.getElementById;
+    globalThis.document.getElementById = (id) => {
+      if (id === 'panel-calendar') return panel;
+      return origGetById(id);
+    };
+  });
+
+  it('stale 데이터일 때 stale-notice를 표시한다', async () => {
+    const ts = Date.now() - (3 * 60 * 60 * 1000);
+    globalThis.getSchedule = async () => ({
+      data: [mockRace],
+      timestamp: ts,
+      isStale: true,
+    });
+    await renderCalendar();
+    assert.ok(panel.innerHTML.includes('stale-notice'));
+    assert.ok(panel.innerHTML.includes('3시간 전'));
+  });
+
+  it('fresh 데이터일 때 stale-notice를 표시하지 않는다', async () => {
+    globalThis.getSchedule = async () => ({
+      data: [mockRace],
+      timestamp: Date.now(),
+      isStale: false,
+    });
+    await renderCalendar();
+    assert.ok(!panel.innerHTML.includes('stale-notice'));
   });
 });

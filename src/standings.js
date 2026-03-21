@@ -3,10 +3,15 @@ async function renderStandings() {
   panel.innerHTML = '<div class="loading">Loading standings</div>';
 
   try {
-    const [drivers, constructors] = await Promise.all([
+    const [driversResult, constructorsResult] = await Promise.all([
       getDriverStandings(),
       getConstructorStandings(),
     ]);
+
+    const drivers = driversResult.data;
+    const constructors = constructorsResult.data;
+    const isStale = driversResult.isStale || constructorsResult.isStale;
+    const oldestTimestamp = Math.min(driversResult.timestamp, constructorsResult.timestamp);
 
     panel.innerHTML = `
       <div class="standings-toggle">
@@ -40,9 +45,10 @@ async function renderStandings() {
           </div>
         `).join('')}
       </div>
+
+      ${isStale ? `<div class="stale-notice">마지막 업데이트: ${timeAgo(oldestTimestamp)}</div>` : ''}
     `;
 
-    // Toggle drivers/constructors
     panel.querySelectorAll('.standings-toggle__btn').forEach(btn => {
       btn.addEventListener('click', () => {
         panel.querySelectorAll('.standings-toggle__btn').forEach(b => b.classList.remove('standings-toggle__btn--active'));

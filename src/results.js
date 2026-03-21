@@ -3,7 +3,8 @@ async function renderResults() {
   panel.innerHTML = '<div class="loading">Loading results</div>';
 
   try {
-    const race = await getLastRaceResults();
+    const result = await getLastRaceResults();
+    const race = result.data;
     if (!race) {
       panel.innerHTML = '<div class="error">No results available yet</div>';
       return;
@@ -67,6 +68,8 @@ async function renderResults() {
           <span>${race.Results.find(r => r.FastestLap?.rank === '1')?.FastestLap.Time.time || ''}</span>
         </div>
       ` : ''}
+
+      ${result.isStale ? `<div class="stale-notice">마지막 업데이트: ${timeAgo(result.timestamp)}</div>` : ''}
     `;
   } catch (err) {
     panel.innerHTML = `<div class="error">Failed to load results: ${err.message}</div>`;

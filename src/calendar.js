@@ -40,7 +40,8 @@ async function renderCalendar() {
   panel.innerHTML = '<div class="loading">Loading calendar</div>';
 
   try {
-    const races = await getSchedule();
+    const result = await getSchedule();
+    const races = result.data;
     const nextIdx = races.findIndex(isNextRace);
 
     panel.innerHTML = races.map((race, i) => {
@@ -75,9 +76,8 @@ async function renderCalendar() {
           </div>
         </details>
       `;
-    }).join('');
+    }).join('') + (result.isStale ? `<div class="stale-notice">마지막 업데이트: ${timeAgo(result.timestamp)}</div>` : '');
 
-    // Scroll to next race
     if (nextIdx > -1) {
       const nextCard = panel.querySelector('.race-card--next');
       if (nextCard) nextCard.scrollIntoView({ block: 'start' });

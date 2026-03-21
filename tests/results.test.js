@@ -2,7 +2,7 @@ const { describe, it, beforeEach, mock } = require('node:test');
 const assert = require('node:assert/strict');
 const { resetStorage, loadSrc } = require('./setup');
 
-loadSrc('src/teams.js', 'src/cache.js', 'src/api.js', 'src/results.js');
+loadSrc('src/teams.js', 'src/cache.js', 'src/toast.js', 'src/api.js', 'src/results.js');
 
 // DOM mock — renderResults가 쓰는 panel을 시뮬레이션
 let panelHtml = '';
@@ -216,5 +216,37 @@ describe('renderResults', () => {
     );
     await renderResults();
     assert.ok(panelHtml.includes('Finished'));
+  });
+
+  it('stale 데이터일 때 stale-notice를 표시한다', async () => {
+    const ts = Date.now() - (3 * 60 * 60 * 1000);
+    globalThis.getLastRaceResults = async () => ({
+      data: mockRace(),
+      timestamp: ts,
+      isStale: true,
+    });
+    await renderResults();
+    assert.ok(panelHtml.includes('stale-notice'));
+    assert.ok(panelHtml.includes('3시간 전'));
+  });
+
+  it('fresh 데이터일 때 stale-notice를 표시하지 않는다', async () => {
+    globalThis.getLastRaceResults = async () => ({
+      data: mockRace(),
+      timestamp: Date.now(),
+      isStale: false,
+    });
+    await renderResults();
+    assert.ok(!panelHtml.includes('stale-notice'));
+  });
+
+  it('결과 없음일 때 null data를 처리한다', async () => {
+    globalThis.getLastRaceResults = async () => ({
+      data: null,
+      timestamp: Date.now(),
+      isStale: false,
+    });
+    await renderResults();
+    assert.ok(panelHtml.includes('No results available yet'));
   });
 });
