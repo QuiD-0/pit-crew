@@ -2,7 +2,7 @@ const CACHE_TTL = {
   schedule: 24 * 60 * 60 * 1000,           // 24시간
   standings_drivers: 60 * 60 * 1000,       // 1시간
   standings_constructors: 60 * 60 * 1000,  // 1시간
-  results: 60 * 60 * 1000,                 // 1시간
+  results_r: 60 * 60 * 1000,              // 1시간 (라운드별 결과)
 };
 
 async function cacheGet(key, options = {}) {
@@ -11,7 +11,7 @@ async function cacheGet(key, options = {}) {
       const entry = data[key];
       if (!entry) return resolve(null);
 
-      const ttl = CACHE_TTL[key] || CACHE_TTL.schedule;
+      const ttl = CACHE_TTL[key] || CACHE_TTL[Object.keys(CACHE_TTL).find(k => key.startsWith(k))] || CACHE_TTL.schedule;
       const isStale = Date.now() - entry.timestamp > ttl;
 
       if (isStale && !options.stale) return resolve(null);

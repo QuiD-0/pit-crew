@@ -439,9 +439,32 @@ body {
   margin-bottom: 12px;
 }
 
+.results-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .results-header__name {
   font-size: 15px;
   font-weight: 700;
+}
+
+.results-header__select {
+  font-size: 11px;
+  padding: 4px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg-card);
+  color: var(--color-text);
+  cursor: pointer;
+  max-width: 160px;
+}
+
+.results-header__select:focus {
+  outline: none;
+  border-color: var(--color-primary);
 }
 
 .results-header__info {

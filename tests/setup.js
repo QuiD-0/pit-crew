@@ -9,7 +9,9 @@ globalThis.chrome = {
   storage: {
     local: {
       get(keys, cb) {
-        if (Array.isArray(keys)) {
+        if (keys === null) {
+          cb({ ...storage });
+        } else if (Array.isArray(keys)) {
           const result = {};
           for (const key of keys) {
             if (storage[key] !== undefined) result[key] = storage[key];

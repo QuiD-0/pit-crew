@@ -72,14 +72,15 @@ async function getSeasonWinners() {
   }
 }
 
-async function getLastRaceResults() {
-  const cached = await cacheGet('results', { stale: true });
+async function getRaceResults(round) {
+  const key = `results_r${round}`;
+  const cached = await cacheGet(key, { stale: true });
   if (cached && !cached.isStale) return cached;
 
   try {
-    const data = await fetchF1('/current/last/results.json');
+    const data = await fetchF1(`/current/${round}/results.json`);
     const race = data.RaceTable.Races[0] || null;
-    await cacheSet('results', race);
+    await cacheSet(key, race);
     return { data: race, timestamp: Date.now(), isStale: false };
   } catch (err) {
     if (cached) return cached;

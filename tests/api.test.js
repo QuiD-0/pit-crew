@@ -122,13 +122,13 @@ describe('getConstructorStandings', () => {
   });
 });
 
-describe('getLastRaceResults', () => {
+describe('getRaceResults', () => {
   beforeEach(() => {
     resetStorage();
     mock.restoreAll();
   });
 
-  it('최근 레이스 결과를 가져온다', async () => {
+  it('특정 라운드의 레이스 결과를 가져온다', async () => {
     const mockRace = { raceName: 'Chinese GP', Results: [] };
     mock.method(globalThis, 'fetch', () =>
       Promise.resolve({
@@ -138,7 +138,7 @@ describe('getLastRaceResults', () => {
         }),
       })
     );
-    const result = await getLastRaceResults();
+    const result = await getRaceResults('3');
     assert.deepEqual(result.data, mockRace);
   });
 
@@ -151,7 +151,7 @@ describe('getLastRaceResults', () => {
         }),
       })
     );
-    const result = await getLastRaceResults();
+    const result = await getRaceResults('3');
     assert.equal(result.data, null);
   });
 });
@@ -231,18 +231,18 @@ describe('stale fallback — 다른 API 함수들', () => {
     assert.equal(result.isStale, true);
   });
 
-  it('getLastRaceResults — API 실패 + stale null 데이터 캐시 폴백', async () => {
+  it('getRaceResults — API 실패 + stale null 데이터 캐시 폴백', async () => {
     const ts = Date.now() - (2 * 60 * 60 * 1000);
-    storage.results = { data: null, timestamp: ts };
+    storage.results_r3 = { data: null, timestamp: ts };
     mock.method(globalThis, 'fetch', () => Promise.reject(new Error('offline')));
-    const result = await getLastRaceResults();
+    const result = await getRaceResults('3');
     assert.equal(result.data, null);
     assert.equal(result.isStale, true);
   });
 
-  it('getLastRaceResults — API 실패 + 캐시 없으면 에러', async () => {
+  it('getRaceResults — API 실패 + 캐시 없으면 에러', async () => {
     mock.method(globalThis, 'fetch', () => Promise.reject(new Error('offline')));
-    await assert.rejects(() => getLastRaceResults(), /offline/);
+    await assert.rejects(() => getRaceResults('3'), /offline/);
   });
 
   it('HTTP 에러(500) + stale 캐시 → 폴백', async () => {

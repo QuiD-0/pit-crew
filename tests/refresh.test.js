@@ -11,16 +11,33 @@ globalThis.renderResults = async () => { renderCount++; };
 loadSrc('src/cache.js');
 loadSrc('src/refresh.js');
 
-function createMockBtn() {
+function createMockIcon(autoFire = true) {
+  let iterationCb = null;
+  return {
+    addEventListener(evt, cb, opts) {
+      if (evt === 'animationiteration') {
+        if (autoFire) { Promise.resolve().then(cb); }
+        else { iterationCb = cb; }
+      }
+    },
+    _fireIteration() { if (iterationCb) { iterationCb(); iterationCb = null; } },
+  };
+}
+
+function createMockBtn(iconOverride) {
   const classes = new Set();
+  const icon = iconOverride || createMockIcon();
   return {
     disabled: false,
+    offsetWidth: 100,
+    querySelector() { return icon; },
     classList: {
       add(c) { classes.add(c); },
       remove(c) { classes.delete(c); },
       has(c) { return classes.has(c); },
     },
     _classes: classes,
+    _icon: icon,
   };
 }
 
@@ -33,7 +50,7 @@ describe('createRefreshHandler', () => {
 
   it('클릭 시 캐시를 지우고 렌더 함수를 호출한다', async () => {
     storage.schedule = { data: [], timestamp: Date.now() };
-    storage.results = { data: {}, timestamp: Date.now() };
+    storage.results_r1 = { data: {}, timestamp: Date.now() };
     storage.standings_drivers = { data: [], timestamp: Date.now() };
     storage.standings_constructors = { data: [], timestamp: Date.now() };
 
@@ -42,7 +59,7 @@ describe('createRefreshHandler', () => {
     await handler();
 
     assert.equal(storage.schedule.timestamp, 0);
-    assert.equal(storage.results.timestamp, 0);
+    assert.equal(storage.results_r1.timestamp, 0);
     assert.equal(renderCount, 3);
   });
 
@@ -75,17 +92,22 @@ describe('createRefreshHandler', () => {
     globalThis.renderStandings = async () => {};
     globalThis.renderResults = async () => {};
 
-    const btn = createMockBtn();
+    const icon = createMockIcon(false);
+    const btn = createMockBtn(icon);
     const handler = createRefreshHandler(btn);
 
     // 첫 번째 클릭 (아직 완료 안 됨)
     const first = handler();
+    // cacheInvalidate 내부 await들이 처리될 때까지 대기
+    await new Promise(r => setTimeout(r, 0));
     // 두 번째, 세 번째 클릭 (무시되어야 함)
     await handler();
     await handler();
 
     // 첫 번째 완료
     resolveRender();
+    await new Promise(r => setTimeout(r, 0));
+    icon._fireIteration();
     await first;
 
     assert.equal(callCount, 1);
@@ -108,7 +130,7 @@ describe('createRefreshHandler', () => {
 
   it('API 실패 시 기존 데이터를 유지하고 showToast를 호출한다', async () => {
     storage.schedule = { data: [1], timestamp: Date.now() };
-    storage.results = { data: {}, timestamp: Date.now() };
+    storage.results_r1 = { data: {}, timestamp: Date.now() };
     storage.standings_drivers = { data: [], timestamp: Date.now() };
     storage.standings_constructors = { data: [], timestamp: Date.now() };
 
@@ -154,6 +176,30 @@ describe('createRefreshHandler', () => {
     await handler();
 
     assert.equal(toastCount, 1);
+  });
+
+  it('애니메이션 사이클이 끝난 후에 spinning이 제거된다', async () => {
+    globalThis.renderCalendar = async () => {};
+    globalThis.renderStandings = async () => {};
+    globalThis.renderResults = async () => {};
+
+    const icon = createMockIcon(false);
+    const btn = createMockBtn(icon);
+    const handler = createRefreshHandler(btn);
+
+    const done = handler();
+    // 렌더가 완료될 때까지 대기
+    await new Promise(r => setTimeout(r, 0));
+    // 렌더 완료 후에도 아직 spinning 중
+    assert.equal(btn._classes.has('header__btn--spinning'), true);
+    assert.equal(btn.disabled, true);
+
+    // 애니메이션 사이클 완료
+    icon._fireIteration();
+    await done;
+
+    assert.equal(btn._classes.has('header__btn--spinning'), false);
+    assert.equal(btn.disabled, false);
   });
 
   it('캐시가 비어있어도 refresh가 크래시하지 않는다', async () => {

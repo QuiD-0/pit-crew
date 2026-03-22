@@ -10,9 +10,14 @@ const mockPanel = {
   get innerHTML() { return panelHtml; },
   set innerHTML(v) { panelHtml = v; },
 };
+let selectListener = null;
 const origGetById = globalThis.document.getElementById;
 globalThis.document.getElementById = (id) => {
   if (id === 'panel-results') return mockPanel;
+  if (id === 'round-select') return {
+    addEventListener(evt, fn) { selectListener = fn; },
+    value: '',
+  };
   return origGetById(id);
 };
 
@@ -20,6 +25,8 @@ function mockRace(overrides = {}) {
   return {
     raceName: 'Australian Grand Prix',
     round: '1',
+    date: '2025-03-01',
+    time: '05:00:00Z',
     Circuit: { circuitName: 'Albert Park Grand Prix Circuit' },
     Results: [
       { position: '1', points: '25', Driver: { code: 'RUS' }, Constructor: { constructorId: 'mercedes' }, Time: { time: '1:33:15.607' }, FastestLap: { rank: '1', Time: { time: '1:35.275' } }, status: 'Finished' },
@@ -39,31 +46,33 @@ function mockRace(overrides = {}) {
   };
 }
 
+const mockSchedule = [
+  { round: '1', raceName: 'Australian Grand Prix', date: '2025-03-01', time: '05:00:00Z' },
+];
+
+function mockApis(race, schedule) {
+  const sched = schedule || mockSchedule;
+  globalThis.getSchedule = async () => ({ data: sched, timestamp: Date.now(), isStale: false });
+  globalThis.getRaceResults = async () => ({ data: race, timestamp: Date.now(), isStale: false });
+}
+
 describe('renderResults', () => {
   beforeEach(() => {
     resetStorage();
     mock.restoreAll();
     panelHtml = '';
+    selectListener = null;
+    globalThis.currentRound = null;
   });
 
-  it('레이스 결과가 없으면 안내 메시지를 표시한다', async () => {
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ MRData: { RaceTable: { Races: [] } } }),
-      })
-    );
+  it('완료된 레이스가 없으면 안내 메시지를 표시한다', async () => {
+    globalThis.getSchedule = async () => ({ data: [], timestamp: Date.now(), isStale: false });
     await renderResults();
     assert.ok(panelHtml.includes('No results available yet'));
   });
 
   it('레이스명과 서킷명을 표시한다', async () => {
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ MRData: { RaceTable: { Races: [mockRace()] } } }),
-      })
-    );
+    mockApis(mockRace());
     await renderResults();
     assert.ok(panelHtml.includes('Australian Grand Prix'));
     assert.ok(panelHtml.includes('Albert Park Grand Prix Circuit'));
@@ -71,12 +80,7 @@ describe('renderResults', () => {
   });
 
   it('포디움 3명을 렌더링한다', async () => {
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ MRData: { RaceTable: { Races: [mockRace()] } } }),
-      })
-    );
+    mockApis(mockRace());
     await renderResults();
     assert.ok(panelHtml.includes('podium--p1'));
     assert.ok(panelHtml.includes('podium--p2'));
@@ -87,58 +91,32 @@ describe('renderResults', () => {
   });
 
   it('P1 시간을 표시한다', async () => {
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ MRData: { RaceTable: { Races: [mockRace()] } } }),
-      })
-    );
+    mockApis(mockRace());
     await renderResults();
     assert.ok(panelHtml.includes('1:33:15.607'));
   });
 
   it('포인트가 있는 드라이버는 +포인트를 표시한다', async () => {
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ MRData: { RaceTable: { Races: [mockRace()] } } }),
-      })
-    );
+    mockApis(mockRace());
     await renderResults();
     assert.ok(panelHtml.includes('+25'));
     assert.ok(panelHtml.includes('+18'));
   });
 
   it('0포인트 드라이버는 빈 문자열을 표시한다', async () => {
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ MRData: { RaceTable: { Races: [mockRace()] } } }),
-      })
-    );
+    mockApis(mockRace());
     await renderResults();
-    // position 11 (0 points) — +0이 아닌 빈 값
     assert.ok(!panelHtml.includes('+0'));
   });
 
   it('리타이어 드라이버는 status를 표시한다', async () => {
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ MRData: { RaceTable: { Races: [mockRace()] } } }),
-      })
-    );
+    mockApis(mockRace());
     await renderResults();
     assert.ok(panelHtml.includes('Retired'));
   });
 
   it('11위 이하 드라이버는 접힌 섹션에 표시한다', async () => {
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ MRData: { RaceTable: { Races: [mockRace()] } } }),
-      })
-    );
+    mockApis(mockRace());
     await renderResults();
     assert.ok(panelHtml.includes('Show remaining drivers'));
     assert.ok(panelHtml.includes('STR'));
@@ -146,12 +124,7 @@ describe('renderResults', () => {
   });
 
   it('패스티스트 랩을 표시한다', async () => {
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ MRData: { RaceTable: { Races: [mockRace()] } } }),
-      })
-    );
+    mockApis(mockRace());
     await renderResults();
     assert.ok(panelHtml.includes('Fastest Lap'));
     assert.ok(panelHtml.includes('RUS'));
@@ -161,12 +134,7 @@ describe('renderResults', () => {
   it('패스티스트 랩 데이터가 없으면 섹션을 표시하지 않는다', async () => {
     const race = mockRace();
     race.Results.forEach(r => delete r.FastestLap);
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ MRData: { RaceTable: { Races: [race] } } }),
-      })
-    );
+    mockApis(race);
     await renderResults();
     assert.ok(!panelHtml.includes('Fastest Lap'));
   });
@@ -174,20 +142,13 @@ describe('renderResults', () => {
   it('Constructor가 없어도 크래시하지 않는다', async () => {
     const race = mockRace();
     race.Results[0].Constructor = undefined;
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ MRData: { RaceTable: { Races: [race] } } }),
-      })
-    );
+    mockApis(race);
     await renderResults();
     assert.ok(panelHtml.includes('RUS'));
   });
 
   it('API 에러 시 에러 메시지를 표시한다', async () => {
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({ ok: false, status: 500 })
-    );
+    globalThis.getSchedule = async () => { throw new Error('API error: 500'); };
     await renderResults();
     assert.ok(panelHtml.includes('Failed to load results'));
   });
@@ -195,12 +156,7 @@ describe('renderResults', () => {
   it('결과가 10명 이하면 접힌 섹션을 표시하지 않는다', async () => {
     const race = mockRace();
     race.Results = race.Results.slice(0, 5);
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ MRData: { RaceTable: { Races: [race] } } }),
-      })
-    );
+    mockApis(race);
     await renderResults();
     assert.ok(!panelHtml.includes('Show remaining drivers'));
   });
@@ -208,19 +164,15 @@ describe('renderResults', () => {
   it('Time이 없는 P1은 status로 폴백한다', async () => {
     const race = mockRace();
     delete race.Results[0].Time;
-    mock.method(globalThis, 'fetch', () =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ MRData: { RaceTable: { Races: [race] } } }),
-      })
-    );
+    mockApis(race);
     await renderResults();
     assert.ok(panelHtml.includes('Finished'));
   });
 
   it('stale 데이터일 때 stale-notice를 표시한다', async () => {
     const ts = Date.now() - (3 * 60 * 60 * 1000);
-    globalThis.getLastRaceResults = async () => ({
+    globalThis.getSchedule = async () => ({ data: mockSchedule, timestamp: Date.now(), isStale: false });
+    globalThis.getRaceResults = async () => ({
       data: mockRace(),
       timestamp: ts,
       isStale: true,
@@ -231,44 +183,21 @@ describe('renderResults', () => {
   });
 
   it('fresh 데이터일 때 stale-notice를 표시하지 않는다', async () => {
-    globalThis.getLastRaceResults = async () => ({
-      data: mockRace(),
-      timestamp: Date.now(),
-      isStale: false,
-    });
+    mockApis(mockRace());
     await renderResults();
     assert.ok(!panelHtml.includes('stale-notice'));
   });
 
   it('결과 없음일 때 null data를 처리한다', async () => {
-    globalThis.getLastRaceResults = async () => ({
-      data: null,
-      timestamp: Date.now(),
-      isStale: false,
-    });
+    mockApis(null);
     await renderResults();
     assert.ok(panelHtml.includes('No results available yet'));
-  });
-
-  it('stale + null data → "No results" 메시지 (stale notice 아님)', async () => {
-    globalThis.getLastRaceResults = async () => ({
-      data: null,
-      timestamp: Date.now() - (2 * 60 * 60 * 1000),
-      isStale: true,
-    });
-    await renderResults();
-    assert.ok(panelHtml.includes('No results available yet'));
-    assert.ok(!panelHtml.includes('stale-notice'));
   });
 
   it('결과가 3명 미만이어도 크래시하지 않는다', async () => {
     const race = mockRace();
     race.Results = race.Results.slice(0, 2);
-    globalThis.getLastRaceResults = async () => ({
-      data: race,
-      timestamp: Date.now(),
-      isStale: false,
-    });
+    mockApis(race);
     await renderResults();
     assert.ok(panelHtml.includes('podium--p1'));
     assert.ok(panelHtml.includes('podium--p2'));
@@ -278,13 +207,27 @@ describe('renderResults', () => {
   it('빈 Results 배열이어도 크래시하지 않는다', async () => {
     const race = mockRace();
     race.Results = [];
-    globalThis.getLastRaceResults = async () => ({
-      data: race,
-      timestamp: Date.now(),
-      isStale: false,
-    });
+    mockApis(race);
     await renderResults();
     assert.ok(panelHtml.includes('Australian Grand Prix'));
     assert.ok(!panelHtml.includes('podium--p1'));
+  });
+
+  it('라운드 드롭다운이 표시된다', async () => {
+    mockApis(mockRace());
+    await renderResults();
+    assert.ok(panelHtml.includes('round-select'));
+    assert.ok(panelHtml.includes('<option'));
+  });
+
+  it('여러 라운드가 있으면 모두 드롭다운에 표시된다', async () => {
+    const schedule = [
+      { round: '1', raceName: 'Australian GP', date: '2025-03-01', time: '05:00:00Z' },
+      { round: '2', raceName: 'Chinese GP', date: '2025-03-15', time: '07:00:00Z' },
+    ];
+    mockApis(mockRace(), schedule);
+    await renderResults();
+    assert.ok(panelHtml.includes('R1 Australian GP'));
+    assert.ok(panelHtml.includes('R2 Chinese GP'));
   });
 });

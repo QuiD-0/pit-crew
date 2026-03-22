@@ -19,20 +19,20 @@ describe('cacheSet / cacheGet', () => {
   });
 
   it('TTL이 만료되면 null을 반환한다', async () => {
-    storage.results = {
+    storage.results_r1 = {
       data: { test: true },
       timestamp: Date.now() - (2 * 60 * 60 * 1000), // 2시간 전 (results TTL은 1시간)
     };
-    const result = await cacheGet('results');
+    const result = await cacheGet('results_r1');
     assert.equal(result, null);
   });
 
   it('TTL 이내면 캐시된 데이터를 반환한다', async () => {
-    storage.results = {
+    storage.results_r1 = {
       data: { test: true },
       timestamp: Date.now() - (30 * 60 * 1000), // 30분 전 (results TTL은 1시간)
     };
-    const result = await cacheGet('results');
+    const result = await cacheGet('results_r1');
     assert.deepEqual(result, { test: true });
   });
 
@@ -51,15 +51,15 @@ describe('cacheGet stale mode', () => {
 
   it('stale:true — TTL 만료된 데이터를 { data, timestamp, isStale: true }로 반환한다', async () => {
     const ts = Date.now() - (2 * 60 * 60 * 1000);
-    storage.results = { data: { test: true }, timestamp: ts };
-    const result = await cacheGet('results', { stale: true });
+    storage.results_r1 = { data: { test: true }, timestamp: ts };
+    const result = await cacheGet('results_r1', { stale: true });
     assert.deepEqual(result, { data: { test: true }, timestamp: ts, isStale: true });
   });
 
   it('stale:true — TTL 이내면 { data, timestamp, isStale: false }로 반환한다', async () => {
     const ts = Date.now() - (30 * 60 * 1000);
-    storage.results = { data: { test: true }, timestamp: ts };
-    const result = await cacheGet('results', { stale: true });
+    storage.results_r1 = { data: { test: true }, timestamp: ts };
+    const result = await cacheGet('results_r1', { stale: true });
     assert.deepEqual(result, { data: { test: true }, timestamp: ts, isStale: false });
   });
 
@@ -69,11 +69,11 @@ describe('cacheGet stale mode', () => {
   });
 
   it('stale:false(기본값)는 기존과 동일하게 동작한다', async () => {
-    storage.results = {
+    storage.results_r1 = {
       data: { test: true },
       timestamp: Date.now() - (2 * 60 * 60 * 1000),
     };
-    const result = await cacheGet('results');
+    const result = await cacheGet('results_r1');
     assert.equal(result, null);
   });
 });
@@ -90,10 +90,10 @@ describe('cacheInvalidate', () => {
 
   it('여러 키를 한번에 무효화한다', async () => {
     storage.schedule = { data: [], timestamp: Date.now() };
-    storage.results = { data: {}, timestamp: Date.now() };
-    await cacheInvalidate(['schedule', 'results']);
+    storage.results_r1 = { data: {}, timestamp: Date.now() };
+    await cacheInvalidate(['schedule', 'results_r1']);
     assert.equal(storage.schedule.timestamp, 0);
-    assert.equal(storage.results.timestamp, 0);
+    assert.equal(storage.results_r1.timestamp, 0);
   });
 
   it('존재하지 않는 키는 무시한다', async () => {
@@ -119,8 +119,8 @@ describe('cacheGet stale — 엣지 케이스', () => {
   });
 
   it('stale:true로 null 데이터가 저장된 캐시 → { data: null, isStale }', async () => {
-    storage.results = { data: null, timestamp: Date.now() };
-    const result = await cacheGet('results', { stale: true });
+    storage.results_r1 = { data: null, timestamp: Date.now() };
+    const result = await cacheGet('results_r1', { stale: true });
     assert.equal(result.data, null);
     assert.equal(result.isStale, false);
   });
@@ -164,7 +164,7 @@ describe('CACHE_TTL', () => {
     assert.equal(CACHE_TTL.standings_constructors, 60 * 60 * 1000);
   });
 
-  it('results는 1시간이다', () => {
-    assert.equal(CACHE_TTL.results, 60 * 60 * 1000);
+  it('results_r은 1시간이다', () => {
+    assert.equal(CACHE_TTL.results_r, 60 * 60 * 1000);
   });
 });
