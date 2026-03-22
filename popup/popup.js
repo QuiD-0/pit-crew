@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const tabBtns = document.querySelectorAll('.tabs__btn');
   const panels = document.querySelectorAll('.tab-panel');
 
+  const content = document.querySelector('.content');
+
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       tabBtns.forEach(b => b.classList.remove('tabs__btn--active'));
@@ -14,9 +16,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (btn.dataset.tab === 'calendar') {
         const nextCard = panel.querySelector('.race-card--next');
         if (nextCard) nextCard.scrollIntoView({ block: 'start' });
-        else panel.scrollTop = 0;
+        else content.scrollTop = 0;
       } else {
-        panel.scrollTop = 0;
+        content.scrollTop = 0;
       }
     });
   });
