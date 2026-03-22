@@ -44,12 +44,19 @@ async function renderCalendar() {
     const races = result.data;
     const nextIdx = races.findIndex(isNextRace);
 
+    let winners = {};
+    try {
+      const winnersResult = await getSeasonWinners();
+      winners = winnersResult.data;
+    } catch (_) { /* 우승자 데이터 없어도 캘린더는 표시 */ }
+
     panel.innerHTML = races.map((race, i) => {
       const isNext = i === nextIdx;
       const isPast = i < nextIdx || (nextIdx === -1);
       const countdown = isNext ? getCountdown(race) : null;
       const sessions = getSessionList(race);
       const location = race.Circuit.Location;
+      const winner = isPast ? winners[race.round] : null;
 
       return `
         <details class="race-card ${isNext ? 'race-card--next' : ''} ${isPast ? 'race-card--past' : ''}" ${isNext ? 'open' : ''}>
@@ -58,6 +65,7 @@ async function renderCalendar() {
             <div class="race-card__info">
               <span class="race-card__name">${race.raceName}</span>
               <span class="race-card__location">${location.locality}, ${location.country}</span>
+              ${winner ? `<span class="race-card__winner">🏆 ${winner.code} · ${winner.time}</span>` : ''}
             </div>
             <div class="race-card__meta">
               ${countdown ? `<span class="race-card__countdown">${countdown}</span>` : ''}

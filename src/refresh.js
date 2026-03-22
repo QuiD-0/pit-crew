@@ -7,7 +7,7 @@ function createRefreshHandler(btn) {
     btn.disabled = true;
     btn.classList.add('header__btn--spinning');
     try {
-      await cacheInvalidate(['schedule', 'standings_drivers', 'standings_constructors', 'results']);
+      await cacheInvalidate(['schedule', 'standings_drivers', 'standings_constructors', 'results', 'season_winners']);
       await Promise.all([renderCalendar(), renderStandings(), renderResults()]);
     } catch (err) {
       showToast('연결 실패');

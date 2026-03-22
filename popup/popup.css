@@ -303,6 +303,12 @@ body {
   color: var(--color-text-muted);
 }
 
+.race-card__winner {
+  font-size: 11px;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
 .race-card__meta {
   text-align: right;
   display: flex;

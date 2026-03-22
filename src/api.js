@@ -52,6 +52,26 @@ async function getConstructorStandings() {
   }
 }
 
+async function getSeasonWinners() {
+  const cached = await cacheGet('season_winners', { stale: true });
+  if (cached && !cached.isStale) return cached;
+
+  try {
+    const data = await fetchF1('/current/results/1.json?limit=30');
+    const races = data.RaceTable.Races;
+    const winners = {};
+    for (const race of races) {
+      const r = race.Results[0];
+      if (r) winners[race.round] = { code: r.Driver.code, time: r.Time?.time || r.status };
+    }
+    await cacheSet('season_winners', winners);
+    return { data: winners, timestamp: Date.now(), isStale: false };
+  } catch (err) {
+    if (cached) return cached;
+    throw err;
+  }
+}
+
 async function getLastRaceResults() {
   const cached = await cacheGet('results', { stale: true });
   if (cached && !cached.isStale) return cached;
