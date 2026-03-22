@@ -5,6 +5,7 @@ function createRefreshHandler(btn) {
     if (isRefreshing) return;
     isRefreshing = true;
     btn.disabled = true;
+    void btn.offsetWidth;
     btn.classList.add('header__btn--spinning');
     try {
       await cacheInvalidate(['schedule', 'standings_drivers', 'standings_constructors', 'results', 'season_winners']);
