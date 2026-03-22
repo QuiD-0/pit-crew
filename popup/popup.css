@@ -206,6 +206,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 16px;
   z-index: 100;
 }
 
@@ -222,9 +223,12 @@ body {
   border-radius: 12px;
   padding: 20px;
   width: 320px;
-  max-height: 420px;
+  max-height: calc(100vh - 32px);
   overflow-y: auto;
 }
+
+.settings-modal__body::-webkit-scrollbar { width: 4px; }
+.settings-modal__body::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
 
 .settings-section {
   margin-bottom: 16px;
