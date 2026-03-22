@@ -23,13 +23,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Theme modal
-  const themeBtn = document.getElementById('theme-btn');
-  const themeModal = document.getElementById('theme-modal');
-  const backdrop = themeModal.querySelector('.theme-modal__backdrop');
+  // Settings modal
+  const settingsBtn = document.getElementById('settings-btn');
+  const settingsModal = document.getElementById('settings-modal');
+  const backdrop = settingsModal.querySelector('.settings-modal__backdrop');
 
-  themeBtn.addEventListener('click', () => themeModal.hidden = false);
-  backdrop.addEventListener('click', () => themeModal.hidden = true);
+  settingsBtn.addEventListener('click', () => settingsModal.hidden = false);
+  backdrop.addEventListener('click', () => settingsModal.hidden = true);
 
   // Refresh button — 캐시 지우고 다시 로드
   const refreshBtn = document.getElementById('refresh-btn');

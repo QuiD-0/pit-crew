@@ -197,10 +197,10 @@ body {
   transform: translateX(32px);
 }
 
-/* === Theme Modal === */
-.theme-modal[hidden] { display: none; }
+/* === Settings Modal === */
+.settings-modal[hidden] { display: none; }
 
-.theme-modal {
+.settings-modal {
   position: fixed;
   inset: 0;
   display: flex;
@@ -209,40 +209,96 @@ body {
   z-index: 100;
 }
 
-.theme-modal__backdrop {
+.settings-modal__backdrop {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
 }
 
-.theme-modal__body {
+.settings-modal__body {
   position: relative;
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 20px;
   width: 320px;
+  max-height: 420px;
+  overflow-y: auto;
 }
 
-.theme-modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.settings-section {
   margin-bottom: 16px;
-  padding-bottom: 12px;
+  padding-bottom: 16px;
   border-bottom: 1px solid var(--color-border);
 }
 
-.theme-modal__body h2 {
-  font-size: 14px;
+.settings-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.settings-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.settings-section h2 {
+  font-size: 13px;
+  font-weight: 600;
   margin: 0;
   color: var(--color-text);
 }
 
-.theme-modal__grid {
+.settings-section--info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.settings-section--info a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.theme-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+}
+
+/* === Donate Button === */
+.donate-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.donate-btn:hover {
+  border-color: var(--color-primary);
+  background: var(--color-bg-card);
+}
+
+.donate-btn__icon {
+  font-size: 16px;
 }
 
 .theme-swatch {

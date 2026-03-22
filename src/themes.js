@@ -40,7 +40,7 @@ function initThemes() {
       document.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('theme-swatch--active'));
       swatch.classList.add('theme-swatch--active');
       applyTheme(id);
-      document.getElementById('theme-modal').hidden = true;
+      document.getElementById('settings-modal').hidden = true;
     });
     grid.appendChild(swatch);
   });

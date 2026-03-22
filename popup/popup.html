@@ -9,7 +9,7 @@
     <h1 class="header__title">PIT CREW</h1>
     <div class="header__actions">
       <button class="header__btn" id="refresh-btn" title="Refresh data"><span class="header__btn-icon">↻</span></button>
-      <button class="header__btn" id="theme-btn" title="Change team theme">🏎️</button>
+      <button class="header__btn" id="settings-btn" title="Settings">⚙️</button>
     </div>
   </header>
 
@@ -25,18 +25,34 @@
     <section class="tab-panel" id="panel-results"></section>
   </main>
 
-  <div class="theme-modal" id="theme-modal" hidden>
-    <div class="theme-modal__backdrop"></div>
-    <div class="theme-modal__body">
-      <div class="theme-modal__header">
-        <h2>Choose Team Theme</h2>
-        <button class="mode-toggle" id="mode-switch" type="button">
-          <span class="mode-toggle__icon">🌙</span>
-          <span class="mode-toggle__icon">☀️</span>
-          <span class="mode-toggle__thumb"></span>
-        </button>
+  <div class="settings-modal" id="settings-modal" hidden>
+    <div class="settings-modal__backdrop"></div>
+    <div class="settings-modal__body">
+      <div class="settings-section">
+        <div class="settings-section__header">
+          <h2>Team Theme</h2>
+          <button class="mode-toggle" id="mode-switch" type="button">
+            <span class="mode-toggle__icon">🌙</span>
+            <span class="mode-toggle__icon">☀️</span>
+            <span class="mode-toggle__thumb"></span>
+          </button>
+        </div>
+        <div class="theme-grid" id="theme-grid"></div>
       </div>
-      <div class="theme-modal__grid" id="theme-grid"></div>
+
+      <div class="settings-section">
+        <h2>Support</h2>
+        <a class="donate-btn" href="https://paypal.me/wodnd101" target="_blank" rel="noopener">
+          <span class="donate-btn__icon">❤️</span>
+          <span class="donate-btn__text">Buy me a coffee</span>
+        </a>
+      </div>
+
+      <div class="settings-section settings-section--info">
+        <span>Pit Crew v0.1</span>
+        <span>·</span>
+        <a href="https://github.com/QuiD-0/pit-crew" target="_blank" rel="noopener">GitHub</a>
+      </div>
     </div>
   </div>
 
