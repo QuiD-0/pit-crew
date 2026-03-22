@@ -21,7 +21,7 @@ function initThemes() {
     const isLight = document.documentElement.dataset.mode === 'light';
     const newMode = isLight ? 'dark' : 'light';
     applyMode(newMode);
-    modeSwitch.classList.toggle('mode-toggle__switch--light', newMode === 'light');
+    modeSwitch.classList.toggle('mode-toggle--light', newMode === 'light');
   });
 
   // Render theme grid
@@ -54,6 +54,6 @@ function initThemes() {
 
     const savedMode = mode || 'dark';
     applyMode(savedMode);
-    modeSwitch.classList.toggle('mode-toggle__switch--light', savedMode === 'light');
+    modeSwitch.classList.toggle('mode-toggle--light', savedMode === 'light');
   });
 }

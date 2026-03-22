@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Pit Crew — F1 Calendar",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "F1 race calendar, standings, and results with team color themes",
   "action": {
     "default_popup": "popup/popup.html",
