@@ -48,5 +48,6 @@ If this policy is updated, changes will be reflected in this document with an up
 
 ## Contact
 
-If you have questions about this privacy policy, please open an issue at:
-https://github.com/QuiD-0/pit-crew/issues
+If you have questions about this privacy policy, please contact:
+- Email: wodnd101@gmail.com
+- GitHub: https://github.com/QuiD-0/pit-crew/issues
