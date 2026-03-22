@@ -5,7 +5,25 @@ function applyTheme(themeId) {
   chrome.storage.local.set({ theme: themeId });
 }
 
+function applyMode(mode) {
+  if (mode === 'light') {
+    document.documentElement.dataset.mode = 'light';
+  } else {
+    delete document.documentElement.dataset.mode;
+  }
+  chrome.storage.local.set({ mode });
+}
+
 function initThemes() {
+  // Mode toggle
+  const modeSwitch = document.getElementById('mode-switch');
+  modeSwitch.addEventListener('click', () => {
+    const isLight = document.documentElement.dataset.mode === 'light';
+    const newMode = isLight ? 'dark' : 'light';
+    applyMode(newMode);
+    modeSwitch.classList.toggle('mode-toggle__switch--light', newMode === 'light');
+  });
+
   // Render theme grid
   const grid = document.getElementById('theme-grid');
   grid.innerHTML = '';
@@ -27,11 +45,15 @@ function initThemes() {
     grid.appendChild(swatch);
   });
 
-  // Load saved theme
-  chrome.storage.local.get('theme', ({ theme }) => {
+  // Load saved theme & mode
+  chrome.storage.local.get(['theme', 'mode'], ({ theme, mode }) => {
     const id = theme || 'f1';
     applyTheme(id);
     const active = grid.querySelector(`[data-theme="${id}"]`);
     if (active) active.classList.add('theme-swatch--active');
+
+    const savedMode = mode || 'dark';
+    applyMode(savedMode);
+    modeSwitch.classList.toggle('mode-toggle__switch--light', savedMode === 'light');
   });
 }
