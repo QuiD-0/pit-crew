@@ -69,7 +69,11 @@ body {
 }
 
 .header__btn-icon {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
 }
 
 .header__btn--spinning .header__btn-icon {
