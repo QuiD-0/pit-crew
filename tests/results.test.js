@@ -76,7 +76,6 @@ describe('renderResults', () => {
     await renderResults();
     assert.ok(panelHtml.includes('Australian Grand Prix'));
     assert.ok(panelHtml.includes('Albert Park Grand Prix Circuit'));
-    assert.ok(panelHtml.includes('Round 1'));
   });
 
   it('포디움 3명을 렌더링한다', async () => {
@@ -227,7 +226,7 @@ describe('renderResults', () => {
     ];
     mockApis(mockRace(), schedule);
     await renderResults();
-    assert.ok(panelHtml.includes('R1 Australian GP'));
-    assert.ok(panelHtml.includes('R2 Chinese GP'));
+    assert.ok(panelHtml.includes('R1 · Australian GP'));
+    assert.ok(panelHtml.includes('R2 · Chinese GP'));
   });
 });

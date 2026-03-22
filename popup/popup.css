@@ -439,32 +439,29 @@ body {
   margin-bottom: 12px;
 }
 
-.results-header__top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.results-header__name {
-  font-size: 15px;
-  font-weight: 700;
-}
-
 .results-header__select {
-  font-size: 11px;
-  padding: 4px 6px;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: var(--color-bg-card);
+  display: block;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 6px 4px;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
   color: var(--color-text);
   cursor: pointer;
-  max-width: 160px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  padding-right: 20px;
 }
 
 .results-header__select:focus {
   outline: none;
-  border-color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
 }
 
 .results-header__info {

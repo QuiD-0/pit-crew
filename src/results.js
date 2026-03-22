@@ -27,8 +27,8 @@ async function renderResults() {
       return;
     }
 
-    const roundSelect = pastRaces.map(r =>
-      `<option value="${r.round}" ${r.round === currentRound ? 'selected' : ''}>R${r.round} ${r.raceName}</option>`
+    const roundOptions = pastRaces.map(r =>
+      `<option value="${r.round}" ${r.round === currentRound ? 'selected' : ''}>R${r.round} · ${r.raceName}</option>`
     ).join('');
 
     const top10 = race.Results.slice(0, 10);
@@ -36,11 +36,8 @@ async function renderResults() {
 
     panel.innerHTML = `
       <div class="results-header">
-        <div class="results-header__top">
-          <h2 class="results-header__name">${race.raceName}</h2>
-          <select class="results-header__select" id="round-select">${roundSelect}</select>
-        </div>
-        <span class="results-header__info">${race.Circuit.circuitName} · Round ${race.round}</span>
+        <select class="results-header__select" id="round-select">${roundOptions}</select>
+        <span class="results-header__info">${race.Circuit.circuitName}</span>
       </div>
 
       <div class="results-podium">
