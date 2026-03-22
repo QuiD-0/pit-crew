@@ -8,7 +8,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       tabBtns.forEach(b => b.classList.remove('tabs__btn--active'));
       panels.forEach(p => p.classList.remove('tab-panel--active'));
       btn.classList.add('tabs__btn--active');
-      document.getElementById(`panel-${btn.dataset.tab}`).classList.add('tab-panel--active');
+      const panel = document.getElementById(`panel-${btn.dataset.tab}`);
+      panel.classList.add('tab-panel--active');
+
+      if (btn.dataset.tab === 'calendar') {
+        const nextCard = panel.querySelector('.race-card--next');
+        if (nextCard) nextCard.scrollIntoView({ block: 'start' });
+        else panel.scrollTop = 0;
+      } else {
+        panel.scrollTop = 0;
+      }
     });
   });
 
