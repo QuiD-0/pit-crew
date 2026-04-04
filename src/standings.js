@@ -22,13 +22,13 @@ async function renderStandings() {
       <div class="standings-list" id="standings-drivers">
         ${drivers.map(d => `
           <div class="standing-row">
-            <span class="standing-row__pos">${d.position}</span>
+            <span class="standing-row__pos">${escapeHtml(d.position)}</span>
             <span class="standing-row__color" style="background: ${getConstructorColor(d.Constructors[0]?.constructorId)}"></span>
             <div class="standing-row__info">
-              <span class="standing-row__name">${d.Driver.givenName} <strong>${d.Driver.familyName}</strong></span>
-              <span class="standing-row__team">${d.Constructors[0]?.name || ''}</span>
+              <span class="standing-row__name">${escapeHtml(d.Driver.givenName)} <strong>${escapeHtml(d.Driver.familyName)}</strong></span>
+              <span class="standing-row__team">${escapeHtml(d.Constructors[0]?.name || '')}</span>
             </div>
-            <span class="standing-row__points">${d.points}<small>pts</small></span>
+            <span class="standing-row__points">${escapeHtml(d.points)}<small>pts</small></span>
           </div>
         `).join('')}
       </div>
@@ -36,12 +36,12 @@ async function renderStandings() {
       <div class="standings-list" id="standings-constructors" style="display:none">
         ${constructors.map(c => `
           <div class="standing-row">
-            <span class="standing-row__pos">${c.position}</span>
+            <span class="standing-row__pos">${escapeHtml(c.position)}</span>
             <span class="standing-row__color" style="background: ${getConstructorColor(c.Constructor.constructorId)}"></span>
             <div class="standing-row__info">
-              <span class="standing-row__name"><strong>${c.Constructor.name}</strong></span>
+              <span class="standing-row__name"><strong>${escapeHtml(c.Constructor.name)}</strong></span>
             </div>
-            <span class="standing-row__points">${c.points}<small>pts</small></span>
+            <span class="standing-row__points">${escapeHtml(c.points)}<small>pts</small></span>
           </div>
         `).join('')}
       </div>
@@ -58,6 +58,6 @@ async function renderStandings() {
       });
     });
   } catch (err) {
-    panel.innerHTML = `<div class="error">Failed to load standings: ${err.message}</div>`;
+    panel.innerHTML = `<div class="error">Failed to load standings: ${escapeHtml(err.message)}</div>`;
   }
 }

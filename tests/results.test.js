@@ -62,7 +62,7 @@ describe('renderResults', () => {
     mock.restoreAll();
     panelHtml = '';
     selectListener = null;
-    globalThis.currentRound = null;
+    renderResults.resetRound();
   });
 
   it('완료된 레이스가 없으면 안내 메시지를 표시한다', async () => {

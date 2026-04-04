@@ -36,6 +36,34 @@ describe('fetchF1 엣지 케이스', () => {
   });
 });
 
+describe('fetchF1 AbortController', () => {
+  beforeEach(() => {
+    resetStorage();
+    mock.restoreAll();
+  });
+
+  it('fetch에 signal 옵션을 전달한다', async () => {
+    let passedOptions = null;
+    mock.method(globalThis, 'fetch', (url, opts) => {
+      passedOptions = opts;
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ MRData: {} }),
+      });
+    });
+    await fetchF1('/current.json');
+    assert.ok(passedOptions?.signal, 'signal이 전달되어야 한다');
+    assert.ok(passedOptions.signal instanceof AbortSignal);
+  });
+
+  it('abort 시 에러가 전파된다', async () => {
+    mock.method(globalThis, 'fetch', (url, opts) => {
+      return Promise.reject(new DOMException('The operation was aborted.', 'AbortError'));
+    });
+    await assert.rejects(() => fetchF1('/slow'), /aborted/i);
+  });
+});
+
 describe('getSchedule fresh 캐시 히트', () => {
   beforeEach(() => {
     resetStorage();

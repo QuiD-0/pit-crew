@@ -61,14 +61,14 @@ async function renderCalendar() {
       return `
         <details class="race-card ${isNext ? 'race-card--next' : ''} ${isPast ? 'race-card--past' : ''}" ${isNext ? 'open' : ''}>
           <summary class="race-card__header">
-            <span class="race-card__round">R${race.round}</span>
+            <span class="race-card__round">R${escapeHtml(race.round)}</span>
             <div class="race-card__info">
-              <span class="race-card__name">${race.raceName}</span>
-              <span class="race-card__location">${location.locality}, ${location.country}</span>
-              ${winner ? `<span class="race-card__winner">🏆 ${winner.code} · ${winner.time}</span>` : ''}
+              <span class="race-card__name">${escapeHtml(race.raceName)}</span>
+              <span class="race-card__location">${escapeHtml(location.locality)}, ${escapeHtml(location.country)}</span>
+              ${winner ? `<span class="race-card__winner">🏆 ${escapeHtml(winner.code)} · ${escapeHtml(winner.time)}</span>` : ''}
             </div>
             <div class="race-card__meta">
-              ${countdown ? `<span class="race-card__countdown">${countdown}</span>` : ''}
+              ${countdown ? `<span class="race-card__countdown">${escapeHtml(countdown)}</span>` : ''}
               <span class="race-card__date">${formatLocalDate(race.date, race.time || '00:00:00Z').date}</span>
             </div>
           </summary>
@@ -77,8 +77,8 @@ async function renderCalendar() {
               const ft = formatLocalDate(s.date, s.time);
               return `
                 <div class="session">
-                  <span class="session__name">${s.name}</span>
-                  <span class="session__time">${ft.weekday} ${ft.date} · ${ft.time}</span>
+                  <span class="session__name">${escapeHtml(s.name)}</span>
+                  <span class="session__time">${escapeHtml(ft.weekday)} ${escapeHtml(ft.date)} · ${escapeHtml(ft.time)}</span>
                 </div>`;
             }).join('')}
           </div>
@@ -91,6 +91,6 @@ async function renderCalendar() {
       if (nextCard) nextCard.scrollIntoView({ block: 'start' });
     }
   } catch (err) {
-    panel.innerHTML = `<div class="error">Failed to load calendar: ${err.message}</div>`;
+    panel.innerHTML = `<div class="error">Failed to load calendar: ${escapeHtml(err.message)}</div>`;
   }
 }

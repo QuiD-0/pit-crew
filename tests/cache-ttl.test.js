@@ -62,6 +62,32 @@ describe('cacheGet TTL 프리픽스 매칭', () => {
   });
 });
 
+describe('season_winners TTL', () => {
+  beforeEach(() => resetStorage());
+
+  it('CACHE_TTL에 season_winners가 24시간으로 정의되어 있다', () => {
+    assert.equal(CACHE_TTL.season_winners, 24 * 60 * 60 * 1000);
+  });
+
+  it('season_winners는 24시간 이내면 캐시 반환', async () => {
+    storage.season_winners = {
+      data: { '1': { code: 'VER', time: '1:30:00' } },
+      timestamp: Date.now() - (12 * 60 * 60 * 1000),
+    };
+    const result = await cacheGet('season_winners');
+    assert.deepEqual(result, { '1': { code: 'VER', time: '1:30:00' } });
+  });
+
+  it('season_winners는 24시간 초과 시 null', async () => {
+    storage.season_winners = {
+      data: { '1': { code: 'VER', time: '1:30:00' } },
+      timestamp: Date.now() - (25 * 60 * 60 * 1000),
+    };
+    const result = await cacheGet('season_winners');
+    assert.equal(result, null);
+  });
+});
+
 describe('cacheSet 타임스탬프', () => {
   beforeEach(() => resetStorage());
 

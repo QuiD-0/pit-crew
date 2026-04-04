@@ -45,7 +45,7 @@ describe('renderResults 라운드 선택', () => {
     mock.restoreAll();
     panelHtml = '';
     selectListener = null;
-    globalThis.currentRound = null;
+    renderResults.resetRound();
   });
 
   it('currentRound가 null이면 마지막 과거 라운드의 결과를 표시한다', async () => {

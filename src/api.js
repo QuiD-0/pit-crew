@@ -1,10 +1,16 @@
 const API_BASE = 'https://api.jolpi.ca/ergast/f1';
 
 async function fetchF1(endpoint) {
-  const res = await fetch(`${API_BASE}${endpoint}`);
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  const json = await res.json();
-  return json.MRData;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+  try {
+    const res = await fetch(`${API_BASE}${endpoint}`, { signal: controller.signal });
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    const json = await res.json();
+    return json.MRData;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 async function getSchedule() {

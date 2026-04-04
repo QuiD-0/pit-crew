@@ -4,6 +4,30 @@ const { loadSrc } = require('./setup');
 
 loadSrc('src/toast.js');
 
+describe('escapeHtml', () => {
+  it('HTML 특수문자를 이스케이프한다', () => {
+    assert.equal(escapeHtml('<script>alert("xss")</script>'), '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;');
+  });
+
+  it('&를 이스케이프한다', () => {
+    assert.equal(escapeHtml('A & B'), 'A &amp; B');
+  });
+
+  it('일반 문자열은 그대로 반환한다', () => {
+    assert.equal(escapeHtml('Max Verstappen'), 'Max Verstappen');
+  });
+
+  it('빈 문자열은 그대로 반환한다', () => {
+    assert.equal(escapeHtml(''), '');
+  });
+
+  it('문자열이 아닌 값은 문자열로 변환한다', () => {
+    assert.equal(escapeHtml(123), '123');
+    assert.equal(escapeHtml(null), '');
+    assert.equal(escapeHtml(undefined), '');
+  });
+});
+
 describe('timeAgo', () => {
   it('1분 미만이면 "방금 전"을 반환한다', () => {
     assert.equal(timeAgo(Date.now() - 30000), '방금 전');

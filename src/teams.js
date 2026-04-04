@@ -14,5 +14,6 @@ const F1_TEAMS = {
 };
 
 function getConstructorColor(constructorId) {
-  return F1_TEAMS[constructorId]?.primary || '#888';
+  const color = F1_TEAMS[constructorId]?.primary || '#888';
+  return /^#[0-9a-fA-F]{3,8}$/.test(color) ? color : '#888';
 }

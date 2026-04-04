@@ -1,3 +1,8 @@
+function escapeHtml(str) {
+  const s = String(str ?? '');
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 function timeAgo(timestamp) {
   const diff = Date.now() - timestamp;
   const mins = Math.floor(diff / 60000);

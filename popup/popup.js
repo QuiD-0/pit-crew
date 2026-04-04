@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize
   initThemes();
-  renderCalendar();
-  renderStandings();
-  renderResults();
+  await renderCalendar();
+  await Promise.all([renderStandings(), renderResults()]);
 });

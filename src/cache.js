@@ -2,6 +2,7 @@ const CACHE_TTL = {
   schedule: 24 * 60 * 60 * 1000,           // 24시간
   standings_drivers: 60 * 60 * 1000,       // 1시간
   standings_constructors: 60 * 60 * 1000,  // 1시간
+  season_winners: 24 * 60 * 60 * 1000,    // 24시간
   results_r: 60 * 60 * 1000,              // 1시간 (라운드별 결과)
 };
 
